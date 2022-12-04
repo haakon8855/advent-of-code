@@ -1,2 +1,2 @@
-# advent-of-code
-My solutions to Advent of Code
+# Advent of Code
+This repo contains my solutions to Advent of Code in Python.
