@@ -12,148 +12,102 @@ Console.WriteLine("Part 1: ");
 chronograph.Toggle();
 // ======================= 
 
-//int GetPossibilities(string springs, string numbers)
-//{
-//    int numSprings = numbers.Split(',').Select(int.Parse).Sum();
-
-//    var qmarks = string.Join("", springs.Where(c => c == '?').Select(c => "1"));
-
-//    int ways = 0;
-//    for (int i = 0; i < Math.Pow(2, qmarks.Length); i++)
-//    {
-//        char[] possibleSprings = springs.ToCharArray();
-//        string pattern = Convert.ToString(i, 2);
-
-//        // if number of working springs in the proposed solution is not equal to the number of
-//        // springs, then we dont have to check that solution.
-//        if ((pattern + springs).Count(c => c == '1') != numSprings)
-//        {
-//            continue;
-//        }
-
-//        int lenDiff = possibleSprings.Length - pattern.Length;
-//        if (lenDiff > 0)
-//        {
-//            pattern = new string('0', lenDiff) + pattern;
-//        }
-
-//        int offset = 0;
-//        for (int j = possibleSprings.Length - 1; j >= 0; j--)
-//        {
-//            if (j - offset < 0)
-//            {
-//                break;
-//            }
-//            while (possibleSprings[j - offset] != '?')
-//            {
-//                offset++;
-//                if (j - offset < 0)
-//                {
-//                    break;
-//                }
-//            }
-//            if (j - offset < 0)
-//            {
-//                break;
-//            }
-//            possibleSprings[j - offset] = pattern[j];
-//        }
-//        string proposal = new string(possibleSprings);
-
-//        if (Groups(proposal) == numbers)
-//        {
-//            ways++;
-//        }
-//    }
-
-//    return ways;
-//}
-
-//int sum = 0;
-//foreach (var line in lines)
-//{
-//    var springs = line.Split(' ')[0].Replace('.', '0').Replace('#', '1');
-//    var numbers = line.Split(' ')[1];
-//    sum += GetPossibilities(springs, numbers);
-//}
-
-//Console.WriteLine(sum);
-
-//string Groups(string springs)
-//{
-//    return string.Join(',', springs.Split('0').Where(s => s != "").Select(s => s.Length).Select(s => s.ToString()));
-//}
-
-var memory = new Dictionary<string, long>();
-
+var cache = new Dictionary<string, long>();
 long GetPossibilitiesRecursive(string springs, List<long> numbers)
 {
-    string key = springs + string.Join(',', numbers);
-    if (memory.ContainsKey(key))
-    {
-        return memory[key];
-    }
     long output = 0;
+
+    // Check if input is in cache
+    string key = springs + string.Join(',', numbers);
+    if (cache.ContainsKey(key))
+    {
+        return cache[key];
+    }
+
+    // Check if string is empty
     if (springs.Length == 0)
     {
+        // if string is empty and there are no more sequences,
+        // configuration is possible
         if (numbers.Count == 0)
             return 1;
         else
             return 0;
     }
+
+    // If first char in string is '.'
     if (springs[0] == '.')
     {
         output = GetPossibilitiesRecursive(springs.Substring(1), numbers);
-        memory[key] = output;
+        cache[key] = output;
         return output;
     }
+
+    // If first char in string is '?'
     if (springs[0] == '?')
     {
         output = GetPossibilitiesRecursive("." + springs.Substring(1), numbers) +
                GetPossibilitiesRecursive("#" + springs.Substring(1), numbers);
-        memory[key] = output;
+        cache[key] = output;
         return output;
     }
+
+    // If first char in string is '#'
     if (springs[0] == '#')
     {
+        // Check if there are more sequences left to place
         if (numbers.Count == 0)
         {
             return 0;
         }
-        long length = numbers[0];
-        if (springs.Length < length)
+
+        long length = numbers[0]; // Length of next sequence
+        if (springs.Length < length) // If string has no more space for next sequence
+        {
             return 0;
+        }
+
+        // Get the first n chars from the string, where n is the length of the next sequence
         string sub = springs.Substring(0, (int)length);
+
+        // If no chars in the string are '.', we can fit the sequence in the substring
         if (!sub.Contains('.'))
         {
+            // Find the remaining string and list of sequences
             List<long> newNumbers = new List<long>(numbers);
             newNumbers.RemoveAt(0);
             string newSprings = springs.Substring((int)length);
+
+            // If remaining string is not empty, need to check next char to avoid collisions
             if (newSprings.Length > 0)
             {
-                char next = newSprings[0];
-                if (next == '#')
+                // If next char after the sequence is '#',
+                // we are not allowed to put the sequence there
+                if (newSprings[0] == '#')
                 {
-                    memory[key] = 0;
+                    cache[key] = 0;
                     return 0;
                 }
                 else
                 {
+                    // We are allowed to put the sequnce
+                    // Remove the first char from newSprings and call recursively
                     output = GetPossibilitiesRecursive(newSprings.Substring(1), newNumbers);
-                    memory[key] = output;
+                    cache[key] = output;
                     return output;
                 }
             }
             else
             {
+                // Remaining string is empty,
                 output = GetPossibilitiesRecursive(newSprings, newNumbers);
-                memory[key] = output;
+                cache[key] = output;
                 return output;
             }
         }
         else
         {
-            memory[key] = 0;
+            cache[key] = 0;
             return 0;
         }
     }
@@ -199,11 +153,9 @@ foreach (var line in lines)
 
     List<long> numbersList = numbers.Split(',').Select(long.Parse).ToList();
 
-    memory.Clear();
+    cache.Clear();
     long possibilities = GetPossibilitiesRecursive(springs, numbersList);
-
     sum += possibilities;
-
     count++;
 }
 
