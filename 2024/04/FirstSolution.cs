@@ -1,6 +1,6 @@
-namespace Three;
+namespace Four;
 
-public class FirstSolution
+public static class FirstSolution
 {
     public static int PartOne(string[] lines)
     {
