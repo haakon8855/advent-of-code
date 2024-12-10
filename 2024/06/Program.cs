@@ -187,18 +187,11 @@ bool Halts(int row, int col)
 }
 
 var sum = 0;
-for (int i = 1; i < clines.Length - 1; i++)
+foreach (var (row, col) in visited)
 {
-    Console.WriteLine(i);
-    for (int j = 1; j < clines[0].Length - 1; j++)
+    if (lines[row][col] == '.' && !Halts(row, col))
     {
-        if (lines[i][j] == '.')
-        {
-            if (!Halts(i, j))
-            {
-                sum++;
-            }
-        }
+        sum++;
     }
 }
 
