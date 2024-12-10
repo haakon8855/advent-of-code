@@ -4,25 +4,25 @@ namespace Utils;
 
 public class Chronograph
 {
-    Stopwatch stopwatch = new Stopwatch();
+    private readonly Stopwatch _stopwatch = new();
 
     public Chronograph()
     {
-        stopwatch.Reset();
+        _stopwatch.Reset();
     }
 
     public void Toggle()
     {
-        if (stopwatch.IsRunning)
+        if (_stopwatch.IsRunning)
         {
-            stopwatch.Stop();
-            Console.WriteLine($"Time: {stopwatch.ElapsedMilliseconds} (ms)");
-            stopwatch.Reset();
+            _stopwatch.Stop();
+            Console.WriteLine($"Time: {_stopwatch.ElapsedMilliseconds} (ms)");
+            _stopwatch.Reset();
         }
         else
         {
-            stopwatch.Start();
+            _stopwatch.Reset();
+            _stopwatch.Start();
         }
     }
 }
-
