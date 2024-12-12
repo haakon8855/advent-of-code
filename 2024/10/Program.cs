@@ -13,7 +13,7 @@ Console.WriteLine("Setup: ");
 chronograph.Toggle();
 // ======================= 
 
-// Add padding to avoid checking boundary indeces
+// Add padding to avoid checking boundary indices
 var padded = lines.ToList();
 var width = padded[0].Length;
 padded = padded.Select(l => '0' + l + '0').ToList();
